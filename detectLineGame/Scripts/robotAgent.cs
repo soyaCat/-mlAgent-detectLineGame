@@ -64,19 +64,30 @@ public class robotAgent : Agent
         if(nextMode == 2)
         {
             var act1 = actionBuffers.DiscreteActions[1];
-            var linePos = redLine_rectTransform.anchoredPosition;
+            var linePosy = redLine_rectTransform.anchoredPosition.y;
+            var linePosx = redLine_rectTransform.anchoredPosition.x;
             var lineRot = Mathf.Round(redLine_rectTransform.eulerAngles.z);
             if (act1==8)
             {
-                if (linePos.y < line_max_y_pos && linePos.x < line_max_x_pos)
-                    redLine_rectTransform.anchoredPosition = new Vector3(linePos.x,linePos.y, 0f) + redLine_rectTransform.up * line_move_unit;
+                if(linePosy < line_max_y_pos)
+                    redLine_rectTransform.anchoredPosition = new Vector3(linePosx, linePosy+line_move_unit, 0f);
             }
             else if(act1 == 2)
             {
-                if (linePos.y > line_min_y_pos && linePos.x > line_min_x_pos)
-                    redLine_rectTransform.anchoredPosition = new Vector3(linePos.x, linePos.y, 0f) - redLine_rectTransform.up * line_move_unit;
+                if (linePosy > line_min_y_pos)
+                    redLine_rectTransform.anchoredPosition = new Vector3(linePosx, linePosy-line_move_unit, 0f);
             }
-            else if(act1 == 4)
+            else if (act1 == 6)
+            {
+                if (linePosx < line_max_x_pos)
+                    redLine_rectTransform.anchoredPosition = new Vector3(linePosx + line_move_unit, linePosy, 0f);
+            }
+            else if (act1 == 4)
+            {
+                if (linePosx > line_min_x_pos)
+                    redLine_rectTransform.anchoredPosition = new Vector3(linePosx - line_move_unit, linePosy, 0f);
+            }
+            else if(act1 == 7)
             {
                 if(lineRot > line_min_z_lot || lineRot < line_max_z_lot)
                     redLine_rectTransform.eulerAngles += new Vector3(0f, 0f, line_lot_unit);
@@ -84,7 +95,7 @@ public class robotAgent : Agent
                     redLine_rectTransform.eulerAngles += new Vector3(0f, 0f, line_lot_unit);
 
             }
-            else if (act1 == 6)
+            else if (act1 == 9)
             {
                 if (lineRot > line_min_z_lot || lineRot < line_max_z_lot)
                     redLine_rectTransform.eulerAngles -= new Vector3(0f, 0f, line_lot_unit);
