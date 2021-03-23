@@ -10,6 +10,12 @@ using System.Linq;
 
 public class robotAgent : Agent
 {
+    const int line_up = 0;
+    const int line_down = 1;
+    const int line_left = 2;
+    const int line_right = 3;
+    const int line_turn_left = 0;
+    const int line_turn_right = 1;
     const float stadium_horizontal = 5f;
     const float stadium_vertical = 5f;
     const float line_max_z_lot = 90f;//90
@@ -24,16 +30,18 @@ public class robotAgent : Agent
     public GameObject camera_pack;
     public GameObject camera_target;
     public GameObject RedLine;
-    public GameObject BlackLine;
 
     private List<string> cam_target_move_mode_list = new List<string>();
     private RectTransform redLine_rectTransform;
-    private RectTransform blackLine_rectTransform;
+
+    private RectTransform blackLine0_rectTransform;
+    private RectTransform blackLine1_rectTransform;
+    private RectTransform blackLine2_rectTransform;
+    private RectTransform blackLine3_rectTransform;
 
     private void Start()
     {
         redLine_rectTransform = RedLine.GetComponent<RectTransform>();
-        blackLine_rectTransform = BlackLine.GetComponent<RectTransform>();
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -64,46 +72,45 @@ public class robotAgent : Agent
         if(nextMode == 2)
         {
             var act1 = actionBuffers.DiscreteActions[1];
+            var act2 = actionBuffers.DiscreteActions[2];
             var linePosy = redLine_rectTransform.anchoredPosition.y;
             var linePosx = redLine_rectTransform.anchoredPosition.x;
             var lineRot = Mathf.Round(redLine_rectTransform.eulerAngles.z);
-            if (act1==8)
+            if (act1==line_up)
             {
                 if(linePosy < line_max_y_pos)
                     redLine_rectTransform.anchoredPosition = new Vector3(linePosx, linePosy+line_move_unit, 0f);
             }
-            else if(act1 == 2)
+            else if(act1 == line_down)
             {
                 if (linePosy > line_min_y_pos)
                     redLine_rectTransform.anchoredPosition = new Vector3(linePosx, linePosy-line_move_unit, 0f);
             }
-            else if (act1 == 6)
+            else if (act1 == line_right)
             {
                 if (linePosx < line_max_x_pos)
                     redLine_rectTransform.anchoredPosition = new Vector3(linePosx + line_move_unit, linePosy, 0f);
             }
-            else if (act1 == 4)
+            else if (act1 == line_left)
             {
                 if (linePosx > line_min_x_pos)
                     redLine_rectTransform.anchoredPosition = new Vector3(linePosx - line_move_unit, linePosy, 0f);
             }
-            else if(act1 == 7)
+            if (act2 == line_turn_left)
             {
-                if(lineRot > line_min_z_lot || lineRot < line_max_z_lot)
+                if (lineRot > line_min_z_lot || lineRot < line_max_z_lot)
                     redLine_rectTransform.eulerAngles += new Vector3(0f, 0f, line_lot_unit);
-                else if(lineRot == line_min_z_lot)
+                else if (lineRot == line_min_z_lot)
                     redLine_rectTransform.eulerAngles += new Vector3(0f, 0f, line_lot_unit);
 
             }
-            else if (act1 == 9)
+            else if (act2 == line_turn_right)
             {
                 if (lineRot > line_min_z_lot || lineRot < line_max_z_lot)
                     redLine_rectTransform.eulerAngles -= new Vector3(0f, 0f, line_lot_unit);
-                else if(lineRot==line_max_z_lot)
+                else if (lineRot == line_max_z_lot)
                     redLine_rectTransform.eulerAngles -= new Vector3(0f, 0f, line_lot_unit);
             }
-            blackLine_rectTransform.position = redLine_rectTransform.position;
-            blackLine_rectTransform.rotation = redLine_rectTransform.rotation;
         }
     }
 
@@ -147,32 +154,38 @@ public class robotAgent : Agent
         if(Input.GetKey(KeyCode.W))
         {
             DiscreteActionsout[0] = 2;
-            DiscreteActionsout[1] = 8;
+            DiscreteActionsout[1] = line_up;
+            DiscreteActionsout[2] = -1;
         }
         else if (Input.GetKey(KeyCode.S))
         {
             DiscreteActionsout[0] = 2;
-            DiscreteActionsout[1] = 2;
+            DiscreteActionsout[1] = line_down;
+            DiscreteActionsout[2] = -1;
         }
         else if (Input.GetKey(KeyCode.A))
         {
             DiscreteActionsout[0] = 2;
-            DiscreteActionsout[1] = 4;
+            DiscreteActionsout[1] = line_left;
+            DiscreteActionsout[2] = -1;
         }
         else if (Input.GetKey(KeyCode.D))
         {
             DiscreteActionsout[0] = 2;
-            DiscreteActionsout[1] = 6;
+            DiscreteActionsout[1] = line_right;
+            DiscreteActionsout[2] = -1;
         }
         else if (Input.GetKey(KeyCode.Q))
         {
             DiscreteActionsout[0] = 2;
-            DiscreteActionsout[1] = 7;
+            DiscreteActionsout[1] = -1;
+            DiscreteActionsout[2] = line_turn_left;
         }
         else if (Input.GetKey(KeyCode.E))
         {
             DiscreteActionsout[0] = 2;
-            DiscreteActionsout[1] = 9;
+            DiscreteActionsout[1] = -1;
+            DiscreteActionsout[2] = line_turn_right;
         }
 
 
