@@ -20,12 +20,12 @@ public class robotAgent : Agent
     const float stadium_vertical = 5f;
     const float line_max_z_lot = 90f;//90
     const float line_min_z_lot = 270f;//-90
-    const float line_max_y_pos = 200;
-    const float line_min_y_pos = -200f;
-    const float line_max_x_pos = 200;
-    const float line_min_x_pos = -200f;
+    const float line_max_y_pos = 60;
+    const float line_min_y_pos = -60f;
+    const float line_max_x_pos = 60;
+    const float line_min_x_pos = -60f;
     const float line_lot_unit = 5f;
-    const float line_move_unit = 10f;
+    const float line_move_unit = 3f;
 
     public GameObject camera_pack;
     public GameObject camera_target;
