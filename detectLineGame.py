@@ -21,7 +21,7 @@ import CustomFuncionFor_mlAgent as CF
 from PIL import Image
 from tqdm import tqdm
 
-game = "DetectLineGame.exe"
+game = "DQN_LINE_Detect_game.exe"
 env_path = "./build/" + game
 save_picture_path = "./made_data/"
 
@@ -43,7 +43,10 @@ list_index_for_mbc0 = 1
 list_index_for_mbc1 = 2
 list_index_for_mbc2 = 3
 list_index_for_mbc3 = 4
-list_index_for_boundary_cam = 5
+list_index_for_bc0 = 5
+list_index_for_bc1 = 6
+list_index_for_bc2 = 7
+list_index_for_bc3 = 8
 generate_main = True
 generate_mbc0 = True
 generate_mbc1 = True
@@ -119,14 +122,13 @@ if __name__ == '__main__':
         if generate_mbc3 == True:
             save_gray_numpy_file('_mbc3', list_index_for_mbc3, wfnliiocn, episodeCount)
         if generate_boundary_cam == True:
-            save_gray_numpy_file('_bc', list_index_for_boundary_cam, wfnliiocn, episodeCount)
+            save_gray_numpy_file('_bc0', list_index_for_bc0, wfnliiocn, episodeCount)
+            save_gray_numpy_file('_bc1', list_index_for_bc1, wfnliiocn, episodeCount)
+            save_gray_numpy_file('_bc2', list_index_for_bc2, wfnliiocn, episodeCount)
+            save_gray_numpy_file('_bc3', list_index_for_bc3, wfnliiocn, episodeCount)
         action = [1, 0, 0]
         actionTuple = ConversionDataType.ConvertList2DiscreteAction(action, behavior_name)
         env.set_actions(behavior_name, actionTuple)
-
-    for episodeCount in tqdm(range(train_count)):
-        pass
-
         env.step()
     env.close()
 
