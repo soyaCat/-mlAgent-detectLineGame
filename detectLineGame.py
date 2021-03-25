@@ -34,7 +34,7 @@ ConversionDataType = CF.ConversionDataType()
 AgentsHelper = CF.AgentsHelper(env, string_log=None, ConversionDataType=ConversionDataType)
 
 connection_test_count = 50
-train_count = 0
+train_count = 1
 test_count =0
 
 write_file_name_list_index_instead_of_correct_name = False
@@ -54,36 +54,67 @@ generate_mbc2 = True
 generate_mbc3 = True
 generate_boundary_cam = True
 
+state_size = [128,128,3]
+action_size = 6
+
+epsilon_init = 1.0
+epsilon_min = 0.1
+
 class DQN_Network():
     def __init__(self):
         pass
 
 class DQN():
     def __init__(self):
-        pass
+        self.epsilon = epsilon_init
+        self.action_size = action_size
 
-class Reward():
+    def get_action(self, state):
+        if self.epsilon > np.random.rand():
+            return np.random.randint(0, self.action_size)
+
+class Get_Reward():
     def __init__(self):
-        self.reward=0
-        self.target_mbc = []
-        self.entire_area = 0
+        self.reward = 0
+        self.target_bc_area = 0
+        self.pre_target_hide_area = 0
+        self.target_bc_index = -1
 
-    def init_reward(self, boundary_arr, mbc0_arr, mbc1_arr, mbc2_arr, mbc3_arr):
-        self.target_mbc.clear()
-        self.entire_area = np.sum(boundary_arr)
-        if np.sum(mbc0_arr != 0):
-            self.target_mbc.append(mbc0_arr)
-        if np.sum(mbc1_arr != 0):
-            self.target_mbc.append(mbc1_arr)
-        if np.sum(mbc2_arr != 0):
-            self.target_mbc.append(mbc2_arr)
-        if np.sum(mbc3_arr != 0):
-            self.target_mbc.append(mbc3_arr)
-
+    def init_reward(self, mbc_dic, bc_dic):
+        bc_sum_list = [np.sum(bc_dic[0]), np.sum(bc_dic[1]), np.sum(bc_dic[2]), np.sum(bc_dic[3])]
+        self.target_bc_index = bc_sum_list.index(max(bc_sum_list))
+        self.target_bc_area = bc_sum_list[self.target_bc_index]
+        self.pre_target_hide_area = np.sum(bc_dic[self.target_bc_index])-np.sum(mbc_dic[self.target_bc_index])
         self.reward = 0
 
-    def update_reward(self):
-        pass
+
+    def update_reward(self, mbc_dic, bc_dic):
+        # target_hide_area가 target_bc이면 라인을 맞춘 것, 0 넓이라면 라인을 전혀 못 맞춘것
+        # target_hide_area가 커지는 방향이면 올바르게 찾는것, 작아지는 방향이면 올바르지 못하게 찾는 것
+        target_hide_area = self.target_bc_area-np.sum(mbc_dic[self.target_bc_index])
+        game_fin = False
+        print("\n")
+        print("시작")
+        print("index :", self.target_bc_index)
+        print("tba   :", self.target_bc_area)
+        print("tmba  :", np.sum(mbc_dic[self.target_bc_index]))
+        print("tha   :", target_hide_area)
+        print("ptha  :", self.pre_target_hide_area)
+
+        if target_hide_area == 0:
+            self.reward = -1
+        elif target_hide_area == self.target_bc_area:
+            self.reward = 1
+            game_fin = True
+
+        else:
+            area_diff = int(target_hide_area) - int(self.pre_target_hide_area)
+            print("arad   :", area_diff)
+            self.reward = area_diff/self.target_bc_area
+            self.pre_target_hide_area = target_hide_area
+
+        return self.reward, game_fin
+
 
 
 
@@ -103,33 +134,100 @@ def save_gray_numpy_file(append_name, list_index, wfnliiocn, episodeCount):
     else:
         im.save(save_picture_path + str(list_index) + '.jpg')
 
+
+
 if __name__ == '__main__':
     totalEpisodeCount = train_count + test_count
+    Get_Reward = Get_Reward()
+    DQN = DQN()
+
 
     for episodeCount in tqdm(range(connection_test_count)):
         behavior_name = behavior_names[0]
         decision_steps, terminal_steps = env.get_steps(behavior_name)
         vec_observation, vis_observation_list, done = AgentsHelper.getObservation(behavior_name)
         wfnliiocn = write_file_name_list_index_instead_of_correct_name
-        if generate_main == True:
+        if generate_main is True:
             save_numpy_file('_main', list_index_for_main, wfnliiocn, episodeCount)
-        if generate_mbc0 == True:
+        if generate_mbc0 is True:
             save_gray_numpy_file('_mbc0', list_index_for_mbc0, wfnliiocn, episodeCount)
-        if generate_mbc1 == True:
+        if generate_mbc1 is True:
             save_gray_numpy_file('_mbc1', list_index_for_mbc1, wfnliiocn, episodeCount)
-        if generate_mbc2 == True:
+        if generate_mbc2 is True:
             save_gray_numpy_file('_mbc2', list_index_for_mbc2, wfnliiocn, episodeCount)
-        if generate_mbc3 == True:
+        if generate_mbc3 is True:
             save_gray_numpy_file('_mbc3', list_index_for_mbc3, wfnliiocn, episodeCount)
-        if generate_boundary_cam == True:
+        if generate_boundary_cam is True:
             save_gray_numpy_file('_bc0', list_index_for_bc0, wfnliiocn, episodeCount)
             save_gray_numpy_file('_bc1', list_index_for_bc1, wfnliiocn, episodeCount)
             save_gray_numpy_file('_bc2', list_index_for_bc2, wfnliiocn, episodeCount)
             save_gray_numpy_file('_bc3', list_index_for_bc3, wfnliiocn, episodeCount)
-        action = [1, 0, 0]
+        action = [1, 0, 0, 0, 0, 0, 0]
         actionTuple = ConversionDataType.ConvertList2DiscreteAction(action, behavior_name)
         env.set_actions(behavior_name, actionTuple)
         env.step()
+
+
+    for episodeCount in tqdm(range(train_count)):
+        behavior_name = behavior_names[0]
+        decision_steps, terminal_steps = env.get_steps(behavior_name)
+        vec_observation, vis_observation_list, done = AgentsHelper.getObservation(behavior_name)
+        bc_dic = {
+            0: vis_observation_list[list_index_for_bc0],
+            1: vis_observation_list[list_index_for_bc1],
+            2: vis_observation_list[list_index_for_bc2],
+            3: vis_observation_list[list_index_for_bc3]}
+        mbc_dic = {
+            0: vis_observation_list[list_index_for_mbc0],
+            1: vis_observation_list[list_index_for_mbc1],
+            2: vis_observation_list[list_index_for_mbc2],
+            3: vis_observation_list[list_index_for_mbc3]}
+        Get_Reward.init_reward(mbc_dic, bc_dic)
+
+        while 1:
+            behavior_name = behavior_names[0]
+            decision_steps, terminal_steps = env.get_steps(behavior_name)
+            vec_observation, vis_observation_list, done = AgentsHelper.getObservation(behavior_name)
+
+            state = vis_observation_list[list_index_for_main]
+            calculated_action_index = DQN.get_action(state)
+            action = [2, 0, 0, 0, 0, 0, 0]
+            action[calculated_action_index+1] = 1
+            actionTuple = ConversionDataType.ConvertList2DiscreteAction(action, behavior_name)
+            env.set_actions(behavior_name, actionTuple)
+            env.step()
+
+            bc_dic = {
+                0: vis_observation_list[list_index_for_bc0],
+                1: vis_observation_list[list_index_for_bc1],
+                2: vis_observation_list[list_index_for_bc2],
+                3: vis_observation_list[list_index_for_bc3]}
+            mbc_dic = {
+                0: vis_observation_list[list_index_for_mbc0],
+                1: vis_observation_list[list_index_for_mbc1],
+                2: vis_observation_list[list_index_for_mbc2],
+                3: vis_observation_list[list_index_for_mbc3]}
+
+            reward, game_fin = Get_Reward.update_reward(mbc_dic, bc_dic)
+            if game_fin is True:
+                break
+
+            print(reward)
+            time.sleep(0.5)
+
+
+
+
+        action = [1, 0, 0, 0, 0, 0, 0]
+        actionTuple = ConversionDataType.ConvertList2DiscreteAction(action, behavior_name)
+        env.set_actions(behavior_name, actionTuple)
+        env.step()
+
+
+
+
+
+
     env.close()
 
 '''
