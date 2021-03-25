@@ -51,6 +51,39 @@ generate_mbc2 = True
 generate_mbc3 = True
 generate_boundary_cam = True
 
+class DQN_Network():
+    def __init__(self):
+        pass
+
+class DQN():
+    def __init__(self):
+        pass
+
+class Reward():
+    def __init__(self):
+        self.reward=0
+        self.target_mbc = []
+        self.entire_area = 0
+
+    def init_reward(self, boundary_arr, mbc0_arr, mbc1_arr, mbc2_arr, mbc3_arr):
+        self.target_mbc.clear()
+        self.entire_area = np.sum(boundary_arr)
+        if np.sum(mbc0_arr != 0):
+            self.target_mbc.append(mbc0_arr)
+        if np.sum(mbc1_arr != 0):
+            self.target_mbc.append(mbc1_arr)
+        if np.sum(mbc2_arr != 0):
+            self.target_mbc.append(mbc2_arr)
+        if np.sum(mbc3_arr != 0):
+            self.target_mbc.append(mbc3_arr)
+
+        self.reward = 0
+
+    def update_reward(self):
+        pass
+
+
+
 
 def save_numpy_file(append_name, list_index, wfnliiocn, episodeCount):
     im = Image.fromarray(vis_observation_list[list_index].astype('uint8'), 'RGB')
