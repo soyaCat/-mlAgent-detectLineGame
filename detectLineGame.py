@@ -21,7 +21,7 @@ import CustomFuncionFor_mlAgent as CF
 from PIL import Image
 from tqdm import tqdm
 
-game = "DQN_LINE_Detect_game.exe"
+game = "DetectLineGame.exe"
 env_path = "./build/" + game
 save_picture_path = "./made_data/"
 
