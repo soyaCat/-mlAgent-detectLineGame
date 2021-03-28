@@ -26,7 +26,7 @@ env_path = "./build/" + game
 save_picture_path = "./made_data/"
 date_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 save_model_path = "./saved_model/"+date_time+"_DQN/"
-load_model_path = "./saved_model/"+"20210328-004425_DQN/model/model"
+load_model_path = "./saved_model/"+"20210328-224721_DQN/model/model"
 load_model = False
 save_model = False
 
@@ -40,10 +40,10 @@ AgentsHelper = CF.AgentsHelper(env, string_log=None, ConversionDataType=Conversi
 
 connection_test_count = 0
 pre_stack_step_before_train = 2
-train_count = 2000
+train_count = 1000
 test_count =0
 
-max_episode_step_in_episode = 500
+max_episode_step_in_episode = 300
 target_update_step = 10000
 print_train_statues_interval_episode_count = 1
 save_model_interval_episode_count = 50
