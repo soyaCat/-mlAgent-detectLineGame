@@ -10,23 +10,22 @@ using System.Linq;
 
 public class robotAgent : Agent
 {
-    const int mode = 0;
-    const int line_up = 1;
-    const int line_down = 2;
-    const int line_left = 3;
-    const int line_right = 4;
-    const int line_turn_left = 5;
-    const int line_turn_right = 6;
+    const int line_up = 0;
+    const int line_down = 1;
+    const int line_left = 2;
+    const int line_right = 3;
+    const int line_turn_left = 0;
+    const int line_turn_right = 1;
     const float stadium_horizontal = 5f;
     const float stadium_vertical = 5f;
     const float line_max_z_lot = 90f;//90
     const float line_min_z_lot = 270f;//-90
-    const float line_max_y_pos = 60;
-    const float line_min_y_pos = -60f;
-    const float line_max_x_pos = 60;
-    const float line_min_x_pos = -60f;
+    const float line_max_y_pos = 200;
+    const float line_min_y_pos = -200f;
+    const float line_max_x_pos = 200;
+    const float line_min_x_pos = -200f;
     const float line_lot_unit = 5f;
-    const float line_move_unit = 3f;
+    const float line_move_unit = 10f;
 
     public GameObject camera_pack;
     public GameObject camera_target;
@@ -72,36 +71,32 @@ public class robotAgent : Agent
 
         if(nextMode == 2)
         {
-            var DA_Line_up = actionBuffers.DiscreteActions[line_up];
-            var DA_Line_down = actionBuffers.DiscreteActions[line_down];
-            var DA_Line_left = actionBuffers.DiscreteActions[line_left];
-            var DA_Line_right = actionBuffers.DiscreteActions[line_right];
-            var DA_Line_turn_left = actionBuffers.DiscreteActions[line_turn_left];
-            var DA_Line_turn_right = actionBuffers.DiscreteActions[line_turn_right];
+            var act1 = actionBuffers.DiscreteActions[1];
+            var act2 = actionBuffers.DiscreteActions[2];
             var linePosy = redLine_rectTransform.anchoredPosition.y;
             var linePosx = redLine_rectTransform.anchoredPosition.x;
             var lineRot = Mathf.Round(redLine_rectTransform.eulerAngles.z);
-            if (DA_Line_up == 1)
+            if (act1==line_up)
             {
                 if(linePosy < line_max_y_pos)
                     redLine_rectTransform.anchoredPosition = new Vector3(linePosx, linePosy+line_move_unit, 0f);
             }
-            else if(DA_Line_down == 1)
+            else if(act1 == line_down)
             {
                 if (linePosy > line_min_y_pos)
                     redLine_rectTransform.anchoredPosition = new Vector3(linePosx, linePosy-line_move_unit, 0f);
             }
-            else if (DA_Line_left == 1)
-            {
-                if (linePosx > line_min_x_pos)
-                    redLine_rectTransform.anchoredPosition = new Vector3(linePosx - line_move_unit, linePosy, 0f);
-            }
-            else if (DA_Line_right == 1)
+            else if (act1 == line_right)
             {
                 if (linePosx < line_max_x_pos)
                     redLine_rectTransform.anchoredPosition = new Vector3(linePosx + line_move_unit, linePosy, 0f);
             }
-            else if (DA_Line_turn_left == 1)
+            else if (act1 == line_left)
+            {
+                if (linePosx > line_min_x_pos)
+                    redLine_rectTransform.anchoredPosition = new Vector3(linePosx - line_move_unit, linePosy, 0f);
+            }
+            if (act2 == line_turn_left)
             {
                 if (lineRot > line_min_z_lot || lineRot < line_max_z_lot)
                     redLine_rectTransform.eulerAngles += new Vector3(0f, 0f, line_lot_unit);
@@ -109,7 +104,7 @@ public class robotAgent : Agent
                     redLine_rectTransform.eulerAngles += new Vector3(0f, 0f, line_lot_unit);
 
             }
-            else if (DA_Line_turn_right == 1)
+            else if (act2 == line_turn_right)
             {
                 if (lineRot > line_min_z_lot || lineRot < line_max_z_lot)
                     redLine_rectTransform.eulerAngles -= new Vector3(0f, 0f, line_lot_unit);
@@ -150,82 +145,47 @@ public class robotAgent : Agent
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var DiscreteActionsout = actionsOut.DiscreteActions;
-        DiscreteActionsout[mode] = 0;
-        DiscreteActionsout[line_up] = 0;
-        DiscreteActionsout[line_down] = 0;
-        DiscreteActionsout[line_left] = 0;
-        DiscreteActionsout[line_right] = 0;
-        DiscreteActionsout[line_turn_left] = 0;
-        DiscreteActionsout[line_turn_right] = 0;
+        DiscreteActionsout[0] = 0;
+        DiscreteActionsout[1] = 0;
         if (Input.GetKey(KeyCode.N))
         {
-            DiscreteActionsout[mode] = 1;
-            DiscreteActionsout[line_up] = 0;
-            DiscreteActionsout[line_down] = 0;
-            DiscreteActionsout[line_left] = 0;
-            DiscreteActionsout[line_right] = 0;
-            DiscreteActionsout[line_turn_left] = 0;
-            DiscreteActionsout[line_turn_right] = 0;
+            DiscreteActionsout[0] = 1;
         }
         if(Input.GetKey(KeyCode.W))
         {
-            DiscreteActionsout[mode] = 2;
-            DiscreteActionsout[line_up] = 1;
-            DiscreteActionsout[line_down] = 0;
-            DiscreteActionsout[line_left] = 0;
-            DiscreteActionsout[line_right] = 0;
-            DiscreteActionsout[line_turn_left] = 0;
-            DiscreteActionsout[line_turn_right] = 0;
+            DiscreteActionsout[0] = 2;
+            DiscreteActionsout[1] = line_up;
+            DiscreteActionsout[2] = -1;
         }
         else if (Input.GetKey(KeyCode.S))
         {
-            DiscreteActionsout[mode] = 2;
-            DiscreteActionsout[line_up] = 0;
-            DiscreteActionsout[line_down] = 1;
-            DiscreteActionsout[line_left] = 0;
-            DiscreteActionsout[line_right] = 0;
-            DiscreteActionsout[line_turn_left] = 0;
-            DiscreteActionsout[line_turn_right] = 0;
+            DiscreteActionsout[0] = 2;
+            DiscreteActionsout[1] = line_down;
+            DiscreteActionsout[2] = -1;
         }
         else if (Input.GetKey(KeyCode.A))
         {
-            DiscreteActionsout[mode] = 2;
-            DiscreteActionsout[line_up] = 0;
-            DiscreteActionsout[line_down] = 0;
-            DiscreteActionsout[line_left] = 1;
-            DiscreteActionsout[line_right] = 0;
-            DiscreteActionsout[line_turn_left] = 0;
-            DiscreteActionsout[line_turn_right] = 0;
+            DiscreteActionsout[0] = 2;
+            DiscreteActionsout[1] = line_left;
+            DiscreteActionsout[2] = -1;
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            DiscreteActionsout[mode] = 2;
-            DiscreteActionsout[line_up] = 0;
-            DiscreteActionsout[line_down] = 0;
-            DiscreteActionsout[line_left] = 0;
-            DiscreteActionsout[line_right] = 1;
-            DiscreteActionsout[line_turn_left] = 0;
-            DiscreteActionsout[line_turn_right] = 0;
+            DiscreteActionsout[0] = 2;
+            DiscreteActionsout[1] = line_right;
+            DiscreteActionsout[2] = -1;
         }
         else if (Input.GetKey(KeyCode.Q))
         {
-            DiscreteActionsout[mode] = 2;
-            DiscreteActionsout[line_up] = 0;
-            DiscreteActionsout[line_down] = 0;
-            DiscreteActionsout[line_left] = 0;
-            DiscreteActionsout[line_right] = 0;
-            DiscreteActionsout[line_turn_left] = 1;
-            DiscreteActionsout[line_turn_right] = 0;
+            DiscreteActionsout[0] = 2;
+            DiscreteActionsout[1] = -1;
+            DiscreteActionsout[2] = line_turn_left;
         }
         else if (Input.GetKey(KeyCode.E))
         {
-            DiscreteActionsout[mode] = 2;
-            DiscreteActionsout[line_up] = 0;
-            DiscreteActionsout[line_down] = 0;
-            DiscreteActionsout[line_left] = 0;
-            DiscreteActionsout[line_right] = 0;
-            DiscreteActionsout[line_turn_left] = 0;
-            DiscreteActionsout[line_turn_right] = 1;
+            DiscreteActionsout[0] = 2;
+            DiscreteActionsout[1] = -1;
+            DiscreteActionsout[2] = line_turn_right;
         }
 
 
