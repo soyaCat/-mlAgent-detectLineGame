@@ -27,7 +27,7 @@ save_picture_path = "./made_data/"
 date_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 save_model_path = "./saved_model/"+date_time+"_DQN/"
 load_model_path = "./saved_model/"+"20210328-224721_DQN/model/model"
-load_model = False
+load_model = True
 save_model = False
 
 channel = EngineConfigurationChannel()
@@ -69,7 +69,7 @@ generate_boundary_cam = True
 state_size = [128,128,3]
 action_size = 6
 
-epsilon_init = 1.0
+epsilon_init = 0.9
 epsilon_min = 0.1
 learning_rate = 0.00025
 batch_size = 64
@@ -113,10 +113,11 @@ class DQN():
         self.Saver = tf.train.Saver()
         self.Summary, self.Merge = self.Make_Summary()
         self.update_target()
-
+        print("hello?")
         if load_model == True:
+            print("Is?")
             self.Saver.restore(self.sess, load_model_path)
-
+            print("work?")
     def get_action(self, state):
         if self.epsilon > np.random.rand():
             return np.random.randint(0, self.action_size)
