@@ -32,6 +32,13 @@ public class robotAgent : Agent
     public GameObject camera_target;
     public GameObject RedLine;
 
+    public GameObject redLine;
+    public GameObject B0Line;
+    public GameObject B1Line;
+    public GameObject B2Line;
+    public GameObject B3Line;
+    public GameObject Linecenter;
+
     private List<string> cam_target_move_mode_list = new List<string>();
     private RectTransform redLine_rectTransform;
 
@@ -117,6 +124,21 @@ public class robotAgent : Agent
                     redLine_rectTransform.eulerAngles -= new Vector3(0f, 0f, line_lot_unit);
             }
         }
+
+        B0Line.transform.position = redLine.transform.position;
+        B0Line.transform.rotation = redLine.transform.rotation;
+
+        B1Line.transform.position = redLine.transform.position;
+        B1Line.transform.rotation = redLine.transform.rotation;
+
+        B2Line.transform.position = redLine.transform.position;
+        B2Line.transform.rotation = redLine.transform.rotation;
+
+        B3Line.transform.position = redLine.transform.position;
+        B3Line.transform.rotation = redLine.transform.rotation;
+
+        Linecenter.transform.position = redLine.transform.position;
+        Linecenter.transform.rotation = redLine.transform.rotation;
     }
 
     public override void OnEpisodeBegin()
