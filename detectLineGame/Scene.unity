@@ -809,7 +809,7 @@ Camera:
     m_Bits: 2080
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 197831939bf6ef94086b12b7492acef2, type: 2}
-  m_TargetDisplay: 1
+  m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
@@ -883,7 +883,7 @@ Camera:
     m_Bits: 311
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: fc0f56faf3bec0c428b199cdf260901b, type: 2}
-  m_TargetDisplay: 1
+  m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
@@ -1826,7 +1826,7 @@ Camera:
     m_Bits: 2048
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 46e0a46e5370a2c4190c8cfcd170eab2, type: 2}
-  m_TargetDisplay: 1
+  m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
@@ -2235,7 +2235,7 @@ Camera:
     m_Bits: 1024
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 26654340a6702574bbbc9e5bfd9c49b2, type: 2}
-  m_TargetDisplay: 1
+  m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
@@ -2499,7 +2499,7 @@ Camera:
     m_Bits: 544
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: ada5c463f5ebe2f4aa3b85e9d6c37f4c, type: 2}
-  m_TargetDisplay: 1
+  m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
@@ -2644,7 +2644,7 @@ Camera:
     m_Bits: 4128
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: de8be550039d7bf48a277d1350ca93e2, type: 2}
-  m_TargetDisplay: 1
+  m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
@@ -2897,7 +2897,7 @@ Camera:
     m_Bits: 4096
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: c2f7ec608d5874c48b677e859d4033d0, type: 2}
-  m_TargetDisplay: 1
+  m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
@@ -3201,7 +3201,7 @@ GameObject:
   - component: {fileID: 1640883518}
   - component: {fileID: 1640883519}
   m_Layer: 0
-  m_Name: LinecenterCam
+  m_Name: z_LinecenterCam
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3809,7 +3809,7 @@ Camera:
     m_Bits: 512
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 87665fdf2ee6e9b4594d6bc3eaaa3386, type: 2}
-  m_TargetDisplay: 1
+  m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
@@ -3972,7 +3972,7 @@ GameObject:
   - component: {fileID: 1973642871}
   - component: {fileID: 1973642870}
   m_Layer: 5
-  m_Name: LineCenter
+  m_Name: z_LineCenter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3994,7 +3994,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 20, y: -320}
+  m_AnchoredPosition: {x: 20, y: -270}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1973642870
@@ -4312,7 +4312,7 @@ GameObject:
   - component: {fileID: 2058017244}
   - component: {fileID: 2058017243}
   m_Layer: 5
-  m_Name: LineCenterBack
+  m_Name: z_LineCenterBack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4334,7 +4334,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 20, y: -320}
+  m_AnchoredPosition: {x: 20, y: -270}
   m_SizeDelta: {x: 130, y: 130}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2058017243
@@ -4388,6 +4388,7 @@ GameObject:
   - component: {fileID: 2095786070}
   - component: {fileID: 2095786069}
   - component: {fileID: 2095786068}
+  - component: {fileID: 2095786076}
   - component: {fileID: 2095786075}
   - component: {fileID: 2095786074}
   - component: {fileID: 2095786073}
@@ -4428,7 +4429,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DecisionPeriod: 1
-  TakeActionsBetweenDecisions: 0
+  TakeActionsBetweenDecisions: 1
 --- !u!114 &2095786065
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4448,6 +4449,12 @@ MonoBehaviour:
   camera_pack: {fileID: 414742966}
   camera_target: {fileID: 122289968}
   RedLine: {fileID: 1846257568}
+  redLine: {fileID: 1846257568}
+  B0Line: {fileID: 726405089}
+  B1Line: {fileID: 1036542165}
+  B2Line: {fileID: 203258478}
+  B3Line: {fileID: 380314015}
+  Linecenter: {fileID: 1874551215}
 --- !u!114 &2095786066
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4649,6 +4656,25 @@ MonoBehaviour:
   m_Grayscale: 1
   m_ObservationStacks: 1
   m_Compression: 1
+--- !u!114 &2095786076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2095786062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 282f342c2ab144bf38be65d4d0c4e07d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Camera: {fileID: 1640883519}
+  m_SensorName: mbc_line
+  m_Width: 128
+  m_Height: 128
+  m_Grayscale: 1
+  m_ObservationStacks: 1
+  m_Compression: 1
 --- !u!1 &2118458958
 GameObject:
   m_ObjectHideFlags: 0
@@ -4714,7 +4740,7 @@ Camera:
     m_Bits: 1056
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: f7f23c8dac62daf46895b95c4073d920, type: 2}
-  m_TargetDisplay: 1
+  m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1

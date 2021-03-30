@@ -27,20 +27,21 @@ save_picture_path = "./made_data/"
 date_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 save_model_path = "./saved_model/"+date_time+"_DQN/"
 load_model_path = "./saved_model/"+"20210328-224721_DQN/model/model"
-load_model = True
+load_model = False
 save_model = False
 
 channel = EngineConfigurationChannel()
-channel.set_configuration_parameters(time_scale=20.0, target_frame_rate=120, capture_frame_rate=120)
+channel.set_configuration_parameters(time_scale=1.0, target_frame_rate=60, capture_frame_rate=60)
 env = UnityEnvironment(file_name=env_path, side_channels=[channel])
 env.reset()
 behavior_names = list(env.behavior_specs)
 ConversionDataType = CF.ConversionDataType()
 AgentsHelper = CF.AgentsHelper(env, string_log=None, ConversionDataType=ConversionDataType)
 
-connection_test_count = 0
+connection_test_count = 10
 pre_stack_step_before_train = 2
-train_count = 1000
+position_train_count = 100
+train_count = 0
 test_count =0
 
 max_episode_step_in_episode = 300
@@ -51,15 +52,17 @@ save_model_interval_episode_count = 50
 
 write_file_name_list_index_instead_of_correct_name = False
 list_index_for_main = 0
+list_index_for_LineCenter = 5
 list_index_for_mbc0 = 1
 list_index_for_mbc1 = 2
 list_index_for_mbc2 = 3
 list_index_for_mbc3 = 4
-list_index_for_bc0 = 5
-list_index_for_bc1 = 6
-list_index_for_bc2 = 7
-list_index_for_bc3 = 8
+list_index_for_bc0 = 6
+list_index_for_bc1 = 7
+list_index_for_bc2 = 8
+list_index_for_bc3 = 9
 generate_main = True
+generate_LineCenter = True
 generate_mbc0 = True
 generate_mbc1 = True
 generate_mbc2 = True
@@ -69,7 +72,7 @@ generate_boundary_cam = True
 state_size = [128,128,3]
 action_size = 6
 
-epsilon_init = 0.9
+epsilon_init = 1.0
 epsilon_min = 0.1
 learning_rate = 0.00025
 batch_size = 64
@@ -105,9 +108,10 @@ class DQN():
         self.model = DQN_Network("Q")
         self.target_model = DQN_Network("target")
         self.memory = deque(maxlen = mem_maxlen)
+        self.memory_position = deque(maxlen = mem_maxlen)
         config = tf.ConfigProto()
         config.gpu_options.allow_growth = True
-        self.sess = tf.Session()
+        self.sess = tf.Session(config=config)
         self.init = tf.global_variables_initializer()
         self.sess.run(self.init)
         self.Saver = tf.train.Saver()
@@ -133,6 +137,14 @@ class DQN():
                             dic1set.get('next_state'),
                             dic1set.get('done'),
                             ))
+
+    def append_sample_position(self, dic1set):
+        self.memory_position.append((dic1set.get('state'),
+                                    dic1set.get('action'),
+                                    dic1set.get('reward'),
+                                    dic1set.get('next_state'),
+                                    dic1set.get('done'),
+                                    ))
 
     def save_model(self):
         self.Saver.save(self.sess, save_model_path+"/model/model")
@@ -188,6 +200,21 @@ class DQN():
         self.Summary.add_summary(
             self.sess.run(self.Merge, feed_dict={self.summary_loss:loss, self.summary_reward:reward}), episode)
 
+
+class Get_Reward_for_position():
+    # 목표 라인과 조작 라인의 센터값 간의 거리를 구한다.
+    # 거리가 가까워지면  +, 멀어지면 -, 목표라인에 도달하면 게임 피니쉬
+    def __init__(self):
+        self.reward = 0
+        self.target_bc_arr = np.array([0])
+        self.target_bc_index = -1
+
+    def init_reward(self, bc_dic, center_arr):
+        bc_sum_list = [np.sum(bc_dic[0]), np.sum(bc_dic[1]), np.sum(bc_dic[2]), np.sum(bc_dic[3])]
+        self.target_bc_index = bc_sum_list.index(max(bc_sum_list))
+        print(bc_dic[self.target_bc_index])
+        self.reward = 0
+        print("인덱스:", self.target_bc_index)
 
 
 
@@ -257,6 +284,7 @@ def save_gray_numpy_file(append_name, list_index, wfnliiocn, episodeCount):
 if __name__ == '__main__':
     totalEpisodeCount = train_count + test_count
     Get_Reward = Get_Reward()
+    Get_Reward_for_position = Get_Reward_for_position()
     DQN = DQN()
 
 
@@ -267,6 +295,8 @@ if __name__ == '__main__':
         wfnliiocn = write_file_name_list_index_instead_of_correct_name
         if generate_main is True:
             save_numpy_file('_main', list_index_for_main, wfnliiocn, episodeCount)
+        if generate_LineCenter is True:
+            save_gray_numpy_file('_LineCenter', list_index_for_LineCenter, wfnliiocn, episodeCount)
         if generate_mbc0 is True:
             save_gray_numpy_file('_mbc0', list_index_for_mbc0, wfnliiocn, episodeCount)
         if generate_mbc1 is True:
@@ -286,6 +316,82 @@ if __name__ == '__main__':
         env.step()
 
 
+    for episodeCount in tqdm(range(pre_stack_step_before_train)):
+        behavior_name = behavior_names[0]
+        decision_steps, terminal_steps = env.get_steps(behavior_name)
+        vec_observation, vis_observation_list, done = AgentsHelper.getObservation(behavior_name)
+        bc_dic = {
+            0: vis_observation_list[list_index_for_bc0],
+            1: vis_observation_list[list_index_for_bc1],
+            2: vis_observation_list[list_index_for_bc2],
+            3: vis_observation_list[list_index_for_bc3]}
+        line_center_arr = vis_observation_list[list_index_for_LineCenter]
+        Get_Reward_for_position.init_reward(bc_dic, line_center_arr)
+        dic1set = {
+            'state':0,
+            'action':0,
+            'reward':0,
+            'next_state':0,
+            'done':0}
+        state = vis_observation_list[list_index_for_main]
+        dic1set.update(state=state)
+        episode_rewards = 0
+        done = False
+        rewards = []
+        losses = []
+        episode_step = 0
+
+        while 1:
+            episode_step += 1
+            behavior_name = behavior_names[0]
+
+            # 다음 행동을 계산한 후 유니티 환경에 적용한다.
+            decision_steps, terminal_steps = env.get_steps(behavior_name)
+            vec_observation, vis_observation_list, done = AgentsHelper.getObservation(behavior_name)
+            state = vis_observation_list[list_index_for_main]
+            calculated_action_index = DQN.get_action(state)
+            action = [2, 0, 0, 0, 0, 0, 0]
+            action[calculated_action_index+1] = 1
+            dic1set.update(action=action[1:])
+            actionTuple = ConversionDataType.ConvertList2DiscreteAction(action, behavior_name)
+            env.set_actions(behavior_name, actionTuple)
+            env.step()
+
+            # 다음 상태, 보상, 게임 종료 정보를 취득한다.
+            decision_steps, terminal_steps = env.get_steps(behavior_name)
+            vec_observation, vis_observation_list, done = AgentsHelper.getObservation(behavior_name)
+            next_state = vis_observation_list[list_index_for_main]
+            dic1set.update(next_state=next_state)
+            mbc_dic = {
+                0: vis_observation_list[list_index_for_mbc0],
+                1: vis_observation_list[list_index_for_mbc1],
+                2: vis_observation_list[list_index_for_mbc2],
+                3: vis_observation_list[list_index_for_mbc3]}
+            reward, done = Get_Reward.update_reward(mbc_dic)
+            dic1set.update(reward=reward, done=done)
+            DQN.append_sample(dic1set)
+
+            # state를 업데이트 한다.
+            dic1set.update(state=next_state)
+            episode_rewards += reward
+
+            #타겟 네트워크 업데이트
+            if episode_step % (target_update_step) == 0:
+                DQN.update_target()
+
+            # done == True인 경우 또는 step이 maxstep을 초과할 경우 while문을 탈출
+            if done == True or episode_step % max_episode_step_in_episode == 0:
+                break
+
+        # while 문 탈출
+        print("ep_step{} / episode: {} / ep_rewards: {:.2f} ".format(episode_step, episodeCount, np.mean(episode_rewards)))
+        # 게임 초기화
+        action = [1, 0, 0, 0, 0, 0, 0]
+        actionTuple = ConversionDataType.ConvertList2DiscreteAction(action, behavior_name)
+        env.set_actions(behavior_name, actionTuple)
+        env.step()
+
+    '''
     for episodeCount in tqdm(range(pre_stack_step_before_train)):
         behavior_name = behavior_names[0]
         decision_steps, terminal_steps = env.get_steps(behavior_name)
@@ -466,5 +572,5 @@ if __name__ == '__main__':
         actionTuple = ConversionDataType.ConvertList2DiscreteAction(action, behavior_name)
         env.set_actions(behavior_name, actionTuple)
         env.step()
-
     env.close()
+    '''
